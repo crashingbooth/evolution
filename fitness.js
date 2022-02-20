@@ -30,6 +30,8 @@ function punishSingleWrongChromosome(target, subject) {
   return score;
 }
 
+// positive score based on how well it matches present elements. ignores rests
+// if target is x--- and seq is xxxx xxxx xxxx xxxx, it will get full score
 function evaluateSequencePositive(target, sequence) {
   let score = 0;
   for (let i = 0; i < sequence.phrase.length; i++) {
@@ -38,6 +40,8 @@ function evaluateSequencePositive(target, sequence) {
   return score;
 }
 
+// negative score based on how much it fails to match rests
+// if target is x--- and seq is xxxx xxxx xxxx xxxx, it will get maximum (negative) score
 function evaluateSequenceNegative(target, sequence) {
   let score = 0;
   for (let i = 0; i < sequence.phrase.length; i++) {
@@ -46,5 +50,35 @@ function evaluateSequenceNegative(target, sequence) {
   return score;
 }
 
+function evaluateRolePositive(seq) {
+  if (seq.type === 'lo') {
+    return evaluateSequencePositive([true, false, false, false], seq);
+  } else if (seq.type === 'mid') {
+    return evaluateSequencePositive([false, false, true, false], seq);
+  } else if (seq.type === 'hi') {
+    return evaluateSequencePositive([false, true, true, true], seq);
+  } else {
+    return 0;
+  }
+}
+
+function evaluateRoleNegative(seq) {
+  if (seq.type === 'lo') {
+    return evaluateSequenceNegative([true, false, false, false], seq);
+  } else if (seq.type === 'mid') {
+    return evaluateSequenceNegative([false, false, true, false], seq);
+  } else if (seq.type === 'hi') {
+    return evaluateSequenceNegative([false, true, true, true], seq);
+  } else {
+    return 0;
+  }
+}
+
 module.exports  = { matchSingleChromosome,
-                    rewardSingleCorrectChomosome, punishSingleWrongChromosome, evaluateSequencePositive, evaluateSequenceNegative };
+                    rewardSingleCorrectChomosome,
+                    punishSingleWrongChromosome,
+                    evaluateSequencePositive,
+                    evaluateSequenceNegative,
+                    evaluateRolePositive,  // public
+                    evaluateRoleNegative   // public
+                  };

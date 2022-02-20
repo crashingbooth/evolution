@@ -1,6 +1,7 @@
 const { matchSingleChromosome,
                     rewardSingleCorrectChomosome,
-                    punishSingleWrongChromosome, evaluateSequencePositive, evaluateSequenceNegative} = require('./fitness.js');
+                    punishSingleWrongChromosome, evaluateSequencePositive, evaluateSequenceNegative, evaluateRolePositive,
+                    evaluateRoleNegative} = require('./fitness.js');
 const {LoPat, MidPat, HiPat} = require('./pattern-types.js');
 
 test('all match returns 1', () => {
@@ -84,5 +85,77 @@ test('evaluate sequence: negative', () => {
   const p = new LoPat();
   p.setPhrase('---- ---- ---- ----');
   const score = evaluateSequenceNegative([0,1,1,1], p)
+  expect(score).toBe(0);
+})
+
+// evaluate role: positive
+test('evaluate role positive, lo from start', () => {
+  const p = new LoPat();
+  p.setPhrase('x--- x--- x--- x---');
+  const score = evaluateRolePositive(p)
+  expect(score).toBe(1);
+});
+
+test('evaluate role positive, mid from start', () => {
+  const p = new MidPat();
+  p.setPhrase('x--- x--- x--- x---');
+  const score = evaluateRolePositive(p)
+  expect(score).toBe(0);
+})
+
+test('evaluate role positive, mid ideal', () => {
+  const p = new MidPat();
+  p.setPhrase('--x- --x- --x- --x-');
+  const score = evaluateRolePositive(p)
+  expect(score).toBe(1);
+})
+
+test('evaluate role positive, hi from start', () => {
+  const p = new HiPat();
+  p.setPhrase('x--- x--- x--- x---');
+  const score = evaluateRolePositive(p)
+  expect(score).toBe(0);
+})
+
+test('evaluate role positive, hi ideal', () => {
+  const p = new HiPat();
+  p.setPhrase('-xxx -xxx -xxx -xxx');
+  const score = evaluateRolePositive(p)
+  expect(score).toBe(1);
+})
+
+// evaluate role: negative
+test('evaluate role Negative, lo from start', () => {
+  const p = new LoPat();
+  p.setPhrase('x--- x--- x--- x---');
+  const score = evaluateRoleNegative(p)
+  expect(score).toBe(0);
+});
+
+test('evaluate role Negative, mid from start', () => {
+  const p = new MidPat();
+  p.setPhrase('x--- x--- x--- x---');
+  const score = evaluateRoleNegative(p)
+  expect(score).toBe(-1/3);
+})
+
+test('evaluate role Negative, mid ideal', () => {
+  const p = new MidPat();
+  p.setPhrase('--x- --x- --x- --x-');
+  const score = evaluateRoleNegative(p)
+  expect(score).toBe(0);
+})
+
+test('evaluate role Negative, hi from start', () => {
+  const p = new HiPat();
+  p.setPhrase('x--- x--- x--- x---');
+  const score = evaluateRoleNegative(p)
+  expect(score).toBe(-1);
+})
+
+test('evaluate role Negative, hi ideal', () => {
+  const p = new HiPat();
+  p.setPhrase('-xxx -xxx -xxx -xxx');
+  const score = evaluateRoleNegative(p)
   expect(score).toBe(0);
 })
