@@ -74,11 +74,46 @@ function evaluateRoleNegative(seq) {
   }
 }
 
+function evaluateDensity(idealRatio, seq) {
+  const ticks = seq.phrase.flat();
+  const expectedTicks = Math.round(ticks.length * idealRatio);
+  const maxDistance = Math.max(expectedTicks, ticks.length - expectedTicks);
+  const realTickCount = ticks.reduce((prev,cur) => {
+    return prev + (cur ? 1 : 0);
+  },0);
+  return (1 - Math.abs(expectedTicks - realTickCount)/maxDistance);
+}
+
+function evaluate(evaluators, seq) {
+  // evaluators:
+  // [{
+  //    fitnessFunction: <function taking seq as arg>,
+  //    weight: multiplier, only meaningful relative to other values
+  // }]
+  return evaluators.reduce((prev, e) => {
+    return prev + (e.fitnessFunction(seq) * e.weight);
+  }, 0);
+}
+
+const roleBasedEvaluation = [
+  {
+    fitnessFunction: evaluateRolePositive,
+    weight: 1
+  },
+  {
+    fitnessFunction: evaluateRoleNegative,
+    weight: 1
+  }
+]
+
 module.exports  = { matchSingleChromosome,
                     rewardSingleCorrectChomosome,
                     punishSingleWrongChromosome,
                     evaluateSequencePositive,
                     evaluateSequenceNegative,
                     evaluateRolePositive,  // public
-                    evaluateRoleNegative   // public
+                    evaluateRoleNegative,  // public
+                    evaluateDensity,
+                    evaluate, // public
+                    roleBasedEvaluation // public
                   };

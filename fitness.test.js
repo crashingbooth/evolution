@@ -1,7 +1,8 @@
 const { matchSingleChromosome,
                     rewardSingleCorrectChomosome,
                     punishSingleWrongChromosome, evaluateSequencePositive, evaluateSequenceNegative, evaluateRolePositive,
-                    evaluateRoleNegative} = require('./fitness.js');
+                    evaluateRoleNegative, evaluate,evaluateDensity,
+                    roleBasedEvaluation} = require('./fitness.js');
 const {LoPat, MidPat, HiPat} = require('./pattern-types.js');
 
 test('all match returns 1', () => {
@@ -159,3 +160,54 @@ test('evaluate role Negative, hi ideal', () => {
   const score = evaluateRoleNegative(p)
   expect(score).toBe(0);
 })
+
+// density
+test('density, match', () => {
+  const p = new LoPat();
+  p.setPhrase('x--- x--- x--- x---');
+  const score = evaluateDensity(0.25, p);
+  expect(score).toBe(1);
+})
+
+test('density, match', () => {
+  const p = new LoPat();
+  p.setPhrase('---- ---- ---- x---');
+  const score = evaluateDensity(0.25, p);
+  expect(score).toBe(3/12);
+})
+
+test('density, match', () => {
+  const p = new LoPat();
+  p.setPhrase('xxxx xxxx xxxx xxxx');
+  const score = evaluateDensity(0.25, p);
+  expect(score).toBe(0);
+})
+
+// score
+test('score evaluates correctly: lo from start', () => {
+  const p = new LoPat();
+  p.setPhrase('x--- x--- x--- x---');
+  const score = evaluate(roleBasedEvaluation, p);
+  expect(score).toBe(1);
+});
+
+test('score evaluates correctly: lo modified', () => {
+  const p = new LoPat();
+  p.setPhrase('xxxx x--- x--- x---');
+  const score = evaluate(roleBasedEvaluation, p);
+  expect(score).toBe(0.75);
+});
+
+test('score evaluates correctly: hi at start', () => {
+  const p = new HiPat();
+  p.setPhrase('x--- x--- x--- x---');
+  const score = evaluate(roleBasedEvaluation, p);
+  expect(score).toBe(-1);
+});
+
+test('score evaluates correctly: high modified', () => {
+  const p = new HiPat();
+  p.setPhrase('-xxx x--- x--- x---');
+  const score = evaluate(roleBasedEvaluation, p);
+  expect(score).toBe(-0.5);
+});
